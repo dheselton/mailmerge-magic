@@ -41,7 +41,7 @@ export function EmailActivity({ events }: EmailActivityProps) {
               <TableCell className="text-sm">{e.subject}</TableCell>
               <TableCell>
                 {e.success
-                  ? <CheckCircle className="h-4 w-4 text-green-600" />
+                  ? <CheckCircle className="h-4 w-4 text-primary" />
                   : <XCircle className="h-4 w-4 text-destructive" />}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">{e.provider}</TableCell>
