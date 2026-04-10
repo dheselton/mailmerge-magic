@@ -33,6 +33,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [starterOpen, setStarterOpen] = useState(false);
 
   const openEditor = (template?: EmailTemplate) => {
     if (template) {
