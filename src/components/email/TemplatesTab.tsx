@@ -126,7 +126,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => openEditor()}>Blank Template</DropdownMenuItem>
-            <DropdownMenuItem disabled>From Starter Library</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStarterOpen(true)}>From Starter Library</DropdownMenuItem>
             <DropdownMenuItem disabled>Import from Webflow</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
