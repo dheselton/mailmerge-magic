@@ -232,6 +232,21 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Starter Library */}
+      <StarterLibraryDialog
+        open={starterOpen}
+        onOpenChange={setStarterOpen}
+        onSelect={(html, subject) => {
+          setEditTemplate(null);
+          setEditName('');
+          setEditSubject(subject || '');
+          setEditKind('raw_html');
+          setEditHtml(html);
+          setEditForm(emptyAnnouncementForm());
+          setStarterOpen(false);
+          setEditOpen(true);
+        }}
+      />
     </div>
   );
 }
