@@ -14,6 +14,7 @@ import type { EmailTemplate, ComposeKind, AnnouncementForm } from '@/types/email
 import { MOCK_TEMPLATES } from '@/data/email-mock-data';
 import { emptyAnnouncementForm, payloadToAnnouncementForm, stripEmailScripts, applySampleMerge } from '@/lib/email-utils';
 import { getAIAdapter } from '@/adapters/ai';
+import { StarterLibraryDialog } from './StarterLibraryDialog';
 
 interface TemplatesTabProps {
   templates: EmailTemplate[];
