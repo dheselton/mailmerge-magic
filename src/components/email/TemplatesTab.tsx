@@ -14,6 +14,7 @@ import type { EmailTemplate, ComposeKind, AnnouncementForm } from '@/types/email
 import { MOCK_TEMPLATES } from '@/data/email-mock-data';
 import { emptyAnnouncementForm, payloadToAnnouncementForm, stripEmailScripts, applySampleMerge } from '@/lib/email-utils';
 import { getAIAdapter } from '@/adapters/ai';
+import { StarterLibraryDialog } from './StarterLibraryDialog';
 
 interface TemplatesTabProps {
   templates: EmailTemplate[];
@@ -32,6 +33,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [starterOpen, setStarterOpen] = useState(false);
 
   const openEditor = (template?: EmailTemplate) => {
     if (template) {
@@ -124,7 +126,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => openEditor()}>Blank Template</DropdownMenuItem>
-            <DropdownMenuItem disabled>From Starter Library</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStarterOpen(true)}>From Starter Library</DropdownMenuItem>
             <DropdownMenuItem disabled>Import from Webflow</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -230,6 +232,21 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Starter Library */}
+      <StarterLibraryDialog
+        open={starterOpen}
+        onOpenChange={setStarterOpen}
+        onSelect={(html, subject) => {
+          setEditTemplate(null);
+          setEditName('');
+          setEditSubject(subject || '');
+          setEditKind('raw_html');
+          setEditHtml(html);
+          setEditForm(emptyAnnouncementForm());
+          setStarterOpen(false);
+          setEditOpen(true);
+        }}
+      />
     </div>
   );
 }
