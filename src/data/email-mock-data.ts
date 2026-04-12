@@ -1,4 +1,5 @@
 import type { EmailCampaign, EmailTemplate, EmailEvent, SiteEmailOverride } from '@/types/email-types';
+import { emailShell, ctaButton } from '@/lib/email-utils';
 
 export const MOCK_CAMPAIGNS: EmailCampaign[] = [
   {
@@ -7,7 +8,7 @@ export const MOCK_CAMPAIGNS: EmailCampaign[] = [
     subject: 'We\'re Hiring: Senior Engineers',
     html_body: '<h1>Join our team!</h1><p>We have exciting roles open.</p>',
     compose_kind: 'announcement_form',
-    form_payload: { headline: 'We\'re Hiring!', subhead: 'Senior Engineer Roles', message: 'Join our growing engineering team.', buttonLabel: 'View Roles', buttonUrl: 'https://careers.acme.com', signOff: 'Best, The Acme Team' },
+    form_payload: { headline: 'We\'re Hiring!', subhead: 'Senior Engineer Roles', message: 'Join our growing engineering team.', buttonLabel: 'View Roles', buttonUrl: 'https://careers.acme.com', signOff: 'Best, The Acme Team', blocks: [], useBlocks: false },
     status: 'sent',
     recipient_source: { type: 'talent_pool', pool_id: 'pool-eng' },
     sent_at: '2025-03-15T10:30:00Z',
@@ -37,7 +38,7 @@ export const MOCK_TEMPLATES: EmailTemplate[] = [
     subject: 'New Role: {{job_title}}',
     html_body: '<h1>{{job_title}}</h1><p>Apply now at {{company_name}}</p>',
     kind: 'announcement_form',
-    form_payload: { headline: '{{job_title}}', subhead: 'at {{company_name}}', message: 'We have an exciting new role for you.', buttonLabel: 'Apply Now', buttonUrl: '{{apply_url}}', signOff: '' },
+    form_payload: { headline: '{{job_title}}', subhead: 'at {{company_name}}', message: 'We have an exciting new role for you.', buttonLabel: 'Apply Now', buttonUrl: '{{apply_url}}', signOff: '', blocks: [], useBlocks: false },
     source: 'manual',
     webflow_asset_refs: [],
     created_by: 'user-1',
@@ -75,89 +76,6 @@ export const MOCK_TALENT_POOLS = [
   { id: 'pool-pm', name: 'Product Managers', count: 38 },
   { id: 'pool-all', name: 'All Candidates', count: 523 },
 ];
-
-/* ---------------------------------------------------------------------------
- * Helper: wraps inner body content in a full email-client-safe HTML document.
- * - Table-based 600px centered layout
- * - MSO conditionals for Outlook
- * - Inline styles for Gmail / Yahoo
- * - @media query for mobile (progressive enhancement)
- * - Preheader, unsubscribe footer, merge tags
- * -------------------------------------------------------------------------*/
-function emailShell(preheader: string, bodyRows: string): string {
-  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>{{company_name}}</title>
-<!--[if !mso]><!-->
-<style type="text/css">
-@media only screen and (max-width:620px){
-  .email-container{width:100%!important;max-width:100%!important;}
-  .fluid{width:100%!important;max-width:100%!important;height:auto!important;}
-  .stack-column{display:block!important;width:100%!important;max-width:100%!important;}
-  .center-on-narrow{text-align:center!important;display:block!important;margin-left:auto!important;margin-right:auto!important;float:none!important;}
-  table.center-on-narrow{display:inline-block!important;}
-  .padding-mobile{padding-left:20px!important;padding-right:20px!important;}
-}
-</style>
-<!--<![endif]-->
-<!--[if mso]>
-<style type="text/css">
-table{border-collapse:collapse;}
-</style>
-<![endif]-->
-</head>
-<body style="margin:0;padding:0;background-color:#f4f4f7;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
-<!-- Preheader (hidden) -->
-<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
-${preheader}
-</div>
-<center style="width:100%;background-color:#f4f4f7;">
-<!--[if mso]><table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center"><tr><td><![endif]-->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="margin:0 auto;max-width:600px;">
-${bodyRows}
-</table>
-<!--[if mso]></td></tr></table><![endif]-->
-<!-- Footer -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="margin:0 auto;max-width:600px;">
-<tr>
-<td style="padding:30px 40px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#9a9a9a;text-align:center;" class="padding-mobile">
-<p style="margin:0 0 8px;">{{company_name}} &bull; {{company_address}}</p>
-<p style="margin:0;">You're receiving this because you're part of our talent community.<br/>
-<a href="{{unsubscribe_url}}" style="color:#9a9a9a;text-decoration:underline;">Unsubscribe</a> &bull; <a href="{{preferences_url}}" style="color:#9a9a9a;text-decoration:underline;">Email preferences</a></p>
-</td>
-</tr>
-</table>
-</center>
-</body>
-</html>`;
-}
-
-/* MSO-safe CTA button using VML for Outlook + CSS for modern clients */
-function ctaButton(label: string, url: string, bgColor = '#2563eb', textColor = '#ffffff'): string {
-  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:auto;">
-<tr>
-<td style="border-radius:6px;background:${bgColor};text-align:center;">
-<!--[if mso]>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:44px;v-text-anchor:middle;width:220px;" arcsize="14%" strokecolor="${bgColor}" fillcolor="${bgColor}">
-<w:anchorlock/>
-<center style="color:${textColor};font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;">
-${label}
-</center>
-</v:roundrect>
-<![endif]-->
-<!--[if !mso]><!-->
-<a href="${url}" target="_blank" style="background:${bgColor};border:1px solid ${bgColor};border-radius:6px;color:${textColor};display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;line-height:44px;text-align:center;text-decoration:none;width:220px;-webkit-text-size-adjust:none;">
-${label}
-</a>
-<!--<![endif]-->
-</td>
-</tr>
-</table>`;
-}
 
 /* ---- 1. Job Announcement ---- */
 const jobAnnouncementHtml = emailShell(

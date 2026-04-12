@@ -22,6 +22,49 @@ export interface RecipientSource {
   filter?: Record<string, unknown>;
 }
 
+// === Content Block types ===
+
+export interface HeadingBlock {
+  type: 'heading';
+  id: string;
+  text: string;
+  level: 1 | 2 | 3;
+}
+
+export interface TextBlock {
+  type: 'text';
+  id: string;
+  content: string;
+}
+
+export interface ImageBlock {
+  type: 'image';
+  id: string;
+  url: string;
+  alt: string;
+  width?: number;
+}
+
+export interface ButtonBlock {
+  type: 'button';
+  id: string;
+  label: string;
+  url: string;
+}
+
+export interface DividerBlock {
+  type: 'divider';
+  id: string;
+}
+
+export interface SpacerBlock {
+  type: 'spacer';
+  id: string;
+  height: number;
+}
+
+export type ContentBlock = HeadingBlock | TextBlock | ImageBlock | ButtonBlock | DividerBlock | SpacerBlock;
+
 export interface AnnouncementForm {
   headline: string;
   subhead: string;
@@ -29,6 +72,9 @@ export interface AnnouncementForm {
   buttonLabel: string;
   buttonUrl: string;
   signOff: string;
+  // Dynamic block system
+  blocks: ContentBlock[];
+  useBlocks: boolean;
 }
 
 export interface EmailCampaign {
