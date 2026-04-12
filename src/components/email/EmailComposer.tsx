@@ -452,6 +452,25 @@ export function EmailComposer({
       </Collapsible>
 
       <StarterLibraryDialog open={starterOpen} onOpenChange={setStarterOpen} onSelect={handleStarterSelect} />
+      <WebflowAssetPicker
+        open={assetPickerOpen}
+        onOpenChange={setAssetPickerOpen}
+        onSelect={(asset) => {
+          if (assetPickerBlockId) {
+            const block = formPayload.blocks.find(b => b.id === assetPickerBlockId);
+            if (block && block.type === 'image') {
+              updateBlock(assetPickerBlockId, {
+                ...block,
+                url: asset.url,
+                alt: asset.name,
+                width: asset.dimensions ? Math.min(asset.dimensions.width, 600) : 600,
+                webflowAssetId: asset.id,
+              });
+            }
+          }
+          setAssetPickerBlockId(null);
+        }}
+      />
     </div>
   );
 }
