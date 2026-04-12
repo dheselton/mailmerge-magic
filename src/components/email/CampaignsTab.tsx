@@ -21,7 +21,7 @@ interface CampaignsTabProps {
   brandSettings?: BrandSettings;
 }
 
-export function CampaignsTab({ onSaveAsTemplate }: CampaignsTabProps) {
+export function CampaignsTab({ onSaveAsTemplate, brandSettings }: CampaignsTabProps) {
   const [campaigns, setCampaigns] = useState<EmailCampaign[]>(MOCK_CAMPAIGNS);
   const [subject, setSubject] = useState('');
   const [composeKind, setComposeKind] = useState<ComposeKind>('announcement_form');
