@@ -30,7 +30,7 @@ interface EmailComposerProps {
 
 // ========== Block Editor Components ==========
 
-function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: {
+function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast, onOpenAssetPicker }: {
   block: ContentBlock;
   onChange: (b: ContentBlock) => void;
   onDelete: () => void;
@@ -38,6 +38,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst,
   onMoveDown: () => void;
   isFirst: boolean;
   isLast: boolean;
+  onOpenAssetPicker?: () => void;
 }) {
   const controls = (
     <div className="flex items-center gap-0.5 shrink-0">
@@ -82,10 +83,33 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst,
     case 'image':
       return (
         <div className="flex items-start gap-2 p-2 border rounded-md bg-muted/20">
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 space-y-1.5">
             <Label className="text-xs text-muted-foreground">Image</Label>
-            <Input value={block.url} onChange={e => onChange({ ...block, url: e.target.value })} placeholder="Image URL" className="h-8 text-sm" />
-            <Input value={block.alt} onChange={e => onChange({ ...block, alt: e.target.value })} placeholder="Alt text" className="h-8 text-sm" />
+            <div className="flex gap-1.5">
+              <Input value={block.url} onChange={e => onChange({ ...block, url: e.target.value })} placeholder="Image URL" className="h-8 text-sm flex-1" />
+              <Button variant="outline" size="sm" className="h-8 px-2 shrink-0" onClick={onOpenAssetPicker} title="Browse Webflow Assets">
+                <FolderOpen className="h-3.5 w-3.5 mr-1" /> Assets
+              </Button>
+            </div>
+            <div className="flex gap-1.5">
+              <Input value={block.alt} onChange={e => onChange({ ...block, alt: e.target.value })} placeholder="Alt text" className="h-8 text-sm flex-1" />
+              <div className="flex items-center gap-1 shrink-0">
+                <Input
+                  type="number"
+                  value={block.width ?? 600}
+                  onChange={e => onChange({ ...block, width: parseInt(e.target.value) || 600 })}
+                  className="h-8 text-sm w-20"
+                  min={50}
+                  max={600}
+                  title="Display width in pixels"
+                />
+                <span className="text-[10px] text-muted-foreground">px</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-1.5 text-[10px] text-muted-foreground">
+              <Info className="h-3 w-3 mt-0.5 shrink-0" />
+              <span>Recommended: 600px wide, JPG/PNG. Images scale to fit the email.</span>
+            </div>
             {block.url && (
               <div className="mt-1 border rounded overflow-hidden bg-muted/30 max-h-24">
                 <img src={block.url} alt={block.alt} className="max-w-full h-auto max-h-24 object-contain" />
