@@ -355,6 +355,10 @@ export function EmailComposer({
                     onMoveDown={() => moveBlock(block.id, 1)}
                     isFirst={idx === 0}
                     isLast={idx === formPayload.blocks.length - 1}
+                    onOpenAssetPicker={() => {
+                      setAssetPickerBlockId(block.id);
+                      setAssetPickerOpen(true);
+                    }}
                   />
                 ))}
               </div>
