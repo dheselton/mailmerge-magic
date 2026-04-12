@@ -7,12 +7,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Sparkles, Upload, Clipboard, BookOpen, Globe, ChevronDown, Monitor, Smartphone, Plus, X, ArrowUp, ArrowDown, Image, Type, Heading, MousePointerClick, Minus } from 'lucide-react';
+import { Sparkles, Upload, Clipboard, BookOpen, Globe, ChevronDown, Monitor, Smartphone, Plus, X, ArrowUp, ArrowDown, Image, Type, Heading, MousePointerClick, Minus, FolderOpen, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AnnouncementForm, ComposeKind, ContentBlock } from '@/types/email-types';
 import { emptyAnnouncementForm, stripEmailScripts, applySampleMerge, renderAnnouncementToHTML, parseHtmlToBlocks, renderBlocksToHTML, genBlockId } from '@/lib/email-utils';
 import { AnnouncementLayoutPreview } from './AnnouncementLayoutPreview';
 import { StarterLibraryDialog } from './StarterLibraryDialog';
+import { WebflowAssetPicker } from './WebflowAssetPicker';
 import { getAIAdapter } from '@/adapters/ai';
 
 interface EmailComposerProps {
