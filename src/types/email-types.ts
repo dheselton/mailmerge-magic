@@ -43,6 +43,7 @@ export interface ImageBlock {
   url: string;
   alt: string;
   width?: number;
+  webflowAssetId?: string;
 }
 
 export interface ButtonBlock {
