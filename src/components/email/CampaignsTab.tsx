@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Send, Save, FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import type { EmailCampaign, ComposeKind, RecipientSource, AnnouncementForm } from '@/types/email-types';
+import type { EmailCampaign, ComposeKind, RecipientSource, AnnouncementForm, BrandSettings } from '@/types/email-types';
 import { emptyAnnouncementForm, isValidAnnouncementForSave, parseHtmlToBlocks } from '@/lib/email-utils';
 import { EmailComposer } from './EmailComposer';
 import { RecipientPanel } from './RecipientPanel';
@@ -18,6 +18,7 @@ import { MOCK_CAMPAIGNS, MOCK_EVENTS } from '@/data/email-mock-data';
 
 interface CampaignsTabProps {
   onSaveAsTemplate: (name: string, subject: string, htmlBody: string, kind: ComposeKind, formPayload: AnnouncementForm | null) => void;
+  brandSettings?: BrandSettings;
 }
 
 export function CampaignsTab({ onSaveAsTemplate }: CampaignsTabProps) {
