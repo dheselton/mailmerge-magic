@@ -174,7 +174,8 @@ export function EmailComposer({
   const [starterOpen, setStarterOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+  const [assetPickerBlockId, setAssetPickerBlockId] = useState<string | null>(null);
   // Parse HTML into blocks and switch to visual mode
   const applyHtmlWithParsing = (html: string) => {
     const clean = stripEmailScripts(html);
