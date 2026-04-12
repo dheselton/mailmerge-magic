@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Send, Save, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import type { EmailCampaign, ComposeKind, RecipientSource, AnnouncementForm } from '@/types/email-types';
-import { emptyAnnouncementForm, isValidAnnouncementForSave } from '@/lib/email-utils';
+import { emptyAnnouncementForm, isValidAnnouncementForSave, parseHtmlToBlocks } from '@/lib/email-utils';
 import { EmailComposer } from './EmailComposer';
 import { RecipientPanel } from './RecipientPanel';
 import { MergeTagsPanel } from './MergeTagsPanel';
@@ -78,7 +77,15 @@ export function CampaignsTab({ onSaveAsTemplate }: CampaignsTabProps) {
 
   const handleApplyAI = (html: string) => {
     setHtmlBody(html);
-    setComposeKind('raw_html');
+    // Parse AI-generated HTML into blocks
+    const blocks = parseHtmlToBlocks(html);
+    if (blocks.length > 0) {
+      setFormPayload({ ...emptyAnnouncementForm(), blocks, useBlocks: true });
+      setComposeKind('announcement_form');
+      toast.success(`AI design applied — ${blocks.length} blocks extracted`);
+    } else {
+      setComposeKind('raw_html');
+    }
   };
 
   return (

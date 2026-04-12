@@ -12,7 +12,7 @@ import { Plus, MoreVertical, Copy, Trash2, Pencil, Sparkles, ChevronDown } from 
 import { toast } from 'sonner';
 import type { EmailTemplate, ComposeKind, AnnouncementForm } from '@/types/email-types';
 import { MOCK_TEMPLATES } from '@/data/email-mock-data';
-import { emptyAnnouncementForm, payloadToAnnouncementForm, stripEmailScripts, applySampleMerge } from '@/lib/email-utils';
+import { emptyAnnouncementForm, payloadToAnnouncementForm, stripEmailScripts, applySampleMerge, parseHtmlToBlocks } from '@/lib/email-utils';
 import { getAIAdapter } from '@/adapters/ai';
 import { StarterLibraryDialog } from './StarterLibraryDialog';
 
@@ -106,14 +106,40 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
     try {
       const ai = getAIAdapter();
       const result = await ai.generateDraft({ mode: 'full_template', prompt: aiPrompt });
-      if (result.html) setEditHtml(result.html);
+      if (result.html) {
+        setEditHtml(result.html);
+        // Parse AI HTML into blocks
+        const blocks = parseHtmlToBlocks(result.html);
+        if (blocks.length > 0) {
+          setEditForm({ ...emptyAnnouncementForm(), blocks, useBlocks: true });
+          setEditKind('announcement_form');
+        } else {
+          setEditKind('raw_html');
+        }
+      }
       if (result.subject) setEditSubject(result.subject);
-      setEditKind('raw_html');
       setAiDialogOpen(false);
       toast.success('AI template generated');
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const handleStarterSelect = (html: string, subject?: string) => {
+    const blocks = parseHtmlToBlocks(html);
+    setEditTemplate(null);
+    setEditName('');
+    setEditSubject(subject || '');
+    setEditHtml(html);
+    if (blocks.length > 0) {
+      setEditForm({ ...emptyAnnouncementForm(), blocks, useBlocks: true });
+      setEditKind('announcement_form');
+    } else {
+      setEditKind('raw_html');
+      setEditForm(emptyAnnouncementForm());
+    }
+    setStarterOpen(false);
+    setEditOpen(true);
   };
 
   return (
@@ -236,16 +262,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
       <StarterLibraryDialog
         open={starterOpen}
         onOpenChange={setStarterOpen}
-        onSelect={(html, subject) => {
-          setEditTemplate(null);
-          setEditName('');
-          setEditSubject(subject || '');
-          setEditKind('raw_html');
-          setEditHtml(html);
-          setEditForm(emptyAnnouncementForm());
-          setStarterOpen(false);
-          setEditOpen(true);
-        }}
+        onSelect={handleStarterSelect}
       />
     </div>
   );
