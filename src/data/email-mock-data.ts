@@ -372,6 +372,270 @@ ${ctaButton('Explore Opportunities', '{{careers_url}}')}
 </tr>`
 );
 
+/* ---- 7. Welcome to Talent Community ---- */
+const talentCommunityWelcomeHtml = emailShell(
+  'Welcome to the {{company_name}} talent community!',
+  `<!-- Hero Banner -->
+<tr>
+<td style="padding:0;border-radius:8px 8px 0 0;overflow:hidden;">
+<img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=250&fit=crop" alt="Team collaboration" width="600" style="display:block;width:100%;height:auto;border:0;" class="fluid" />
+</td>
+</tr>
+<tr>
+<td style="padding:30px 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:32px;color:#1a1a2e;font-weight:bold;">Welcome to Our Talent Community!</h1>
+<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Thanks for joining the <strong>{{company_name}}</strong> talent community. You'll be the first to hear about new roles, events, and what it's like to work with us.</p>
+<p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">In the meantime, here's what you can explore:</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 20px;background-color:#ffffff;" class="padding-mobile">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr><td style="padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#374151;">🏢 <a href="{{careers_url}}" style="color:#2563eb;text-decoration:underline;">Browse open positions</a></td></tr>
+<tr><td style="padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#374151;">🎥 <a href="{{culture_url}}" style="color:#2563eb;text-decoration:underline;">Watch our culture video</a></td></tr>
+<tr><td style="padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#374151;">📝 <a href="{{blog_url}}" style="color:#2563eb;text-decoration:underline;">Read our engineering blog</a></td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('Explore Careers', '{{careers_url}}')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">We're glad you're here,<br/>The {{company_name}} Talent Team</p>
+</td>
+</tr>`
+);
+
+/* ---- 8. Hiring Manager Introduction ---- */
+const hiringManagerIntroHtml = emailShell(
+  'Meet your potential future manager at {{company_name}}.',
+  `<!-- Header -->
+<tr>
+<td style="padding:30px 40px 20px;background-color:#ffffff;border-radius:8px 8px 0 0;" class="padding-mobile">
+<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#2563eb;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">Meet the Team</p>
+<h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:30px;color:#1a1a2e;">A Note from Your Potential Manager</h1>
+</td>
+</tr>
+<!-- Manager Card -->
+<tr>
+<td style="padding:0 40px 20px;background-color:#ffffff;" class="padding-mobile">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f8fafc;border-radius:8px;">
+<tr>
+<td style="padding:20px 24px;" width="80" valign="top">
+<img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face" alt="{{manager_name}}" width="64" height="64" style="border-radius:50%;display:block;" />
+</td>
+<td style="padding:20px 24px 20px 0;" valign="top">
+<p style="margin:0 0 2px;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#1a1a2e;font-weight:bold;">{{manager_name}}</p>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b7280;">{{manager_title}} · {{company_name}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">I'm {{manager_name}}, and I lead the {{department}} team at {{company_name}}. I wanted to personally reach out because your background caught my attention.</p>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">We're building something exciting and I'd love to share more about the role and our team's mission. Would you be open to a quick conversation?</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('Schedule a Chat', '{{calendar_url}}')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">Looking forward to connecting,<br/>{{manager_name}}</p>
+</td>
+</tr>`
+);
+
+/* ---- 9. Culture Spotlight ---- */
+const cultureSpotlightHtml = emailShell(
+  'See what it\'s like to work at {{company_name}}.',
+  `<!-- Hero Image -->
+<tr>
+<td style="padding:0;border-radius:8px 8px 0 0;overflow:hidden;">
+<img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&h=280&fit=crop" alt="Team at work" width="600" style="display:block;width:100%;height:auto;border:0;" class="fluid" />
+</td>
+</tr>
+<tr>
+<td style="padding:30px 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:32px;color:#1a1a2e;">Life at {{company_name}}</h1>
+<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b7280;">A peek behind the scenes</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">We believe great work happens when people feel valued, supported, and inspired. Here's a glimpse of what makes {{company_name}} a great place to build your career.</p>
+</td>
+</tr>
+<!-- Team Photo -->
+<tr>
+<td style="padding:0 40px 16px;background-color:#ffffff;" class="padding-mobile">
+<img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=520&h=260&fit=crop" alt="Team collaboration" width="520" style="display:block;max-width:100%;height:auto;border:0;border-radius:6px;" class="fluid" />
+</td>
+</tr>
+<!-- Values -->
+<tr>
+<td style="padding:0 40px 20px;background-color:#ffffff;" class="padding-mobile">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr><td style="padding:10px 16px;background:#eff6ff;border-radius:6px;margin-bottom:8px;">
+<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#2563eb;font-weight:bold;">🌱 Growth & Development</p>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#374151;">Learning stipends, mentorship programs, and career pathing for every role.</p>
+</td></tr>
+</table>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:8px;">
+<tr><td style="padding:10px 16px;background:#f0fdf4;border-radius:6px;">
+<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#059669;font-weight:bold;">🤝 Flexibility & Trust</p>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#374151;">Remote-first culture with flexible hours and unlimited PTO.</p>
+</td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('Explore Our Culture', '{{culture_url}}')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">We'd love for you to be part of our story,<br/>{{company_name}} People Team</p>
+</td>
+</tr>`
+);
+
+/* ---- 10. Diversity & Inclusion Event ---- */
+const deiEventHtml = emailShell(
+  'Join us for {{event_name}} — a {{company_name}} D&I event.',
+  `<!-- Hero Banner -->
+<tr>
+<td style="padding:0;border-radius:8px 8px 0 0;overflow:hidden;background:#7c3aed;">
+<img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=600&h=240&fit=crop" alt="Diversity event" width="600" style="display:block;width:100%;height:auto;border:0;opacity:0.85;" class="fluid" />
+</td>
+</tr>
+<tr>
+<td style="padding:30px 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#7c3aed;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">D&I Event</p>
+<h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:30px;color:#1a1a2e;">{{event_name}}</h1>
+<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b7280;">Hosted by {{company_name}}</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">We're committed to building a workplace where everyone belongs. Join us for <strong>{{event_name}}</strong> to hear from leaders, share perspectives, and connect with our community.</p>
+</td>
+</tr>
+<!-- Event Details -->
+<tr>
+<td style="padding:0 40px 20px;background-color:#ffffff;" class="padding-mobile">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#faf5ff;border:1px solid #e9d5ff;border-radius:6px;">
+<tr><td style="padding:20px 24px;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b7280;padding-bottom:4px;">DATE & TIME</td></tr>
+<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1a1a2e;padding-bottom:14px;font-weight:bold;">{{event_date}} at {{event_time}}</td></tr>
+<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b7280;padding-bottom:4px;">LOCATION</td></tr>
+<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1a1a2e;font-weight:bold;">{{event_location}}</td></tr>
+</table>
+</td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('Register Now', '{{rsvp_url}}', '#7c3aed')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">Together we're stronger,<br/>{{company_name}} D&I Team</p>
+</td>
+</tr>`
+);
+
+/* ---- 11. Passive Candidate Outreach ---- */
+const passiveOutreachHtml = emailShell(
+  '{{company_name}} — we think you\'d be a great fit.',
+  `<!-- Logo Header -->
+<tr>
+<td style="padding:30px 40px 20px;background-color:#ffffff;border-radius:8px 8px 0 0;text-align:center;" class="padding-mobile">
+<img src="https://via.placeholder.com/180x45/2563eb/ffffff?text={{company_name}}" alt="{{company_name}}" width="180" style="display:inline-block;max-height:45px;" />
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:28px;color:#1a1a2e;text-align:center;">We'd Love to Connect</h1>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">I came across your profile and was impressed by your experience in <strong>{{skill_area}}</strong>. At <strong>{{company_name}}</strong>, we're solving interesting problems and building a team of exceptional people.</p>
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">I'm not reaching out about a specific role — I'd simply love to start a conversation about what you're looking for in your career and whether {{company_name}} might be a fit down the road.</p>
+<p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">No pressure, no strings attached. Just a quick chat over coffee (virtual or in-person).</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('Let\'s Connect', '{{calendar_url}}')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">Best,<br/>{{recruiter_name}}<br/>{{recruiter_title}}, {{company_name}}</p>
+</td>
+</tr>`
+);
+
+/* ---- 12. Employee Spotlight / Testimonial ---- */
+const employeeSpotlightHtml = emailShell(
+  'Hear from {{employee_name}} about life at {{company_name}}.',
+  `<!-- Header -->
+<tr>
+<td style="padding:30px 40px 10px;background-color:#ffffff;border-radius:8px 8px 0 0;" class="padding-mobile">
+<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#2563eb;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">Employee Spotlight</p>
+<h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:30px;color:#1a1a2e;">Meet {{employee_name}}</h1>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b7280;">{{employee_title}} at {{company_name}}</p>
+</td>
+</tr>
+<!-- Employee Photo -->
+<tr>
+<td style="padding:16px 40px;background-color:#ffffff;" class="padding-mobile">
+<img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=520&h=300&fit=crop" alt="{{employee_name}}" width="520" style="display:block;max-width:100%;height:auto;border:0;border-radius:8px;" class="fluid" />
+</td>
+</tr>
+<!-- Quote -->
+<tr>
+<td style="padding:10px 40px 20px;background-color:#ffffff;" class="padding-mobile">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-left:4px solid #2563eb;background:#f8fafc;border-radius:0 6px 6px 0;">
+<tr><td style="padding:16px 20px;">
+<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:16px;line-height:26px;color:#374151;font-style:italic;">"{{employee_quote}}"</p>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b7280;">— {{employee_name}}, {{employee_title}}</p>
+</td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
+<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">Hi {{member_name}},</p>
+<p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;">We wanted to share {{employee_name}}'s story with you. At {{company_name}}, every person brings a unique perspective that makes our team stronger. Interested in writing your own story here?</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;" class="padding-mobile">
+${ctaButton('See Open Roles', '{{careers_url}}')}
+</td>
+</tr>
+<tr>
+<td style="padding:0 40px 30px;background-color:#ffffff;border-radius:0 0 8px 8px;" class="padding-mobile">
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6b7280;">We'd love to meet you,<br/>{{company_name}} Talent Team</p>
+</td>
+</tr>`
+);
+
 export interface StarterTemplate {
   id: string;
   name: string;
@@ -388,4 +652,10 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
   { id: 'starter-4', name: 'Interview Confirmation', description: 'Confirm interview details with date, time, interviewer, and prep tips.', subject: 'Interview Confirmed: {{job_title}} — {{interview_date}}', category: 'Scheduling', html: interviewConfirmationHtml },
   { id: 'starter-5', name: 'Referral Request', description: 'Ask your network to refer great candidates with referral bonus info.', subject: 'Know Someone Great? Refer Them to {{company_name}}', category: 'Referrals', html: referralRequestHtml },
   { id: 'starter-6', name: 'Talent Pool Re-engagement', description: 'Re-engage cold candidates with new opportunities and company highlights.', subject: 'New Opportunities at {{company_name}} — Let\'s Reconnect', category: 'Engagement', html: reEngagementHtml },
+  { id: 'starter-7', name: 'Welcome to Talent Community', description: 'Welcome new members to your talent community with links and resources.', subject: 'Welcome to the {{company_name}} Talent Community!', category: 'Engagement', html: talentCommunityWelcomeHtml },
+  { id: 'starter-8', name: 'Hiring Manager Introduction', description: 'Personal outreach from a hiring manager with headshot and calendar link.', subject: 'A Note from {{manager_name}} at {{company_name}}', category: 'Sourcing', html: hiringManagerIntroHtml },
+  { id: 'starter-9', name: 'Culture Spotlight', description: 'Showcase your company culture with photos, values, and team highlights.', subject: 'Life at {{company_name}} — See What We\'re About', category: 'Engagement', html: cultureSpotlightHtml },
+  { id: 'starter-10', name: 'D&I Event Invitation', description: 'Promote a diversity & inclusion event with details and registration.', subject: 'Join Us: {{event_name}} — {{company_name}}', category: 'Engagement', html: deiEventHtml },
+  { id: 'starter-11', name: 'Passive Candidate Outreach', description: 'Warm outreach to passive candidates — no specific role, just a conversation.', subject: 'Hi {{member_name}} — Let\'s Connect', category: 'Sourcing', html: passiveOutreachHtml },
+  { id: 'starter-12', name: 'Employee Spotlight', description: 'Share an employee testimonial with photo and quote to attract talent.', subject: 'Meet {{employee_name}} — Life at {{company_name}}', category: 'Engagement', html: employeeSpotlightHtml },
 ];

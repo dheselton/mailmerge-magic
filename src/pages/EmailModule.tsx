@@ -3,7 +3,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { CampaignsTab } from '@/components/email/CampaignsTab';
 import { TemplatesTab } from '@/components/email/TemplatesTab';
 import { AutomationsTab } from '@/components/email/AutomationsTab';
-import type { EmailTemplate, ComposeKind, AnnouncementForm } from '@/types/email-types';
+import { SettingsTab } from '@/components/email/SettingsTab';
+import type { EmailTemplate, ComposeKind, AnnouncementForm, BrandSettings } from '@/types/email-types';
+import { DEFAULT_BRAND_SETTINGS } from '@/types/email-types';
 import { MOCK_TEMPLATES } from '@/data/email-mock-data';
 import { emptyAnnouncementForm, payloadToAnnouncementForm } from '@/lib/email-utils';
 import { Mail } from 'lucide-react';
@@ -11,6 +13,7 @@ import { Mail } from 'lucide-react';
 const EmailModule = () => {
   const [activeTab, setActiveTab] = useState('campaigns');
   const [templates, setTemplates] = useState<EmailTemplate[]>(MOCK_TEMPLATES);
+  const [brandSettings, setBrandSettings] = useState<BrandSettings>(DEFAULT_BRAND_SETTINGS);
 
   // When "Use Template" is clicked in Templates tab, switch to Campaigns and load it
   const [loadedSubject, setLoadedSubject] = useState('');
@@ -57,10 +60,11 @@ const EmailModule = () => {
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="automations">Automations</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="campaigns" className="mt-4">
-          <CampaignsTab onSaveAsTemplate={handleSaveAsTemplate} />
+          <CampaignsTab onSaveAsTemplate={handleSaveAsTemplate} brandSettings={brandSettings} />
         </TabsContent>
 
         <TabsContent value="templates" className="mt-4">
@@ -73,6 +77,10 @@ const EmailModule = () => {
 
         <TabsContent value="automations" className="mt-4">
           <AutomationsTab />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-4">
+          <SettingsTab brand={brandSettings} onBrandChange={setBrandSettings} />
         </TabsContent>
       </Tabs>
     </div>
