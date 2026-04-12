@@ -1,4 +1,4 @@
-import type { AnnouncementForm, ContentBlock } from '@/types/email-types';
+import type { AnnouncementForm, ContentBlock, BrandSettings } from '@/types/email-types';
 
 let _blockIdCounter = 0;
 export function genBlockId(): string {
@@ -273,21 +273,24 @@ export function parseHtmlToBlocks(html: string): ContentBlock[] {
 
 // ========== Blocks to HTML Renderer ==========
 
-function renderBlockRow(block: ContentBlock): string {
+function renderBlockRow(block: ContentBlock, brand?: BrandSettings): string {
+  const font = brand?.fontFamily || 'Arial,Helvetica,sans-serif';
+  const primary = brand?.primaryColor || '#2563eb';
+
   switch (block.type) {
     case 'heading': {
       const tag = `h${block.level}`;
       const sizes: Record<number, string> = { 1: '28px', 2: '22px', 3: '18px' };
       return `<tr>
 <td style="padding:0 40px 10px;background-color:#ffffff;" class="padding-mobile">
-<${tag} style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:${sizes[block.level] || '22px'};line-height:1.3;color:#1a1a2e;font-weight:bold;">${block.text}</${tag}>
+<${tag} style="margin:0;font-family:${font};font-size:${sizes[block.level] || '22px'};line-height:1.3;color:#1a1a2e;font-weight:bold;">${block.text}</${tag}>
 </td>
 </tr>`;
     }
     case 'text':
       return `<tr>
 <td style="padding:0 40px 12px;background-color:#ffffff;" class="padding-mobile">
-<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#374151;white-space:pre-wrap;">${block.content}</p>
+<p style="margin:0;font-family:${font};font-size:15px;line-height:24px;color:#374151;white-space:pre-wrap;">${block.content}</p>
 </td>
 </tr>`;
     case 'image':
@@ -299,7 +302,7 @@ function renderBlockRow(block: ContentBlock): string {
     case 'button':
       return `<tr>
 <td style="padding:10px 40px 20px;background-color:#ffffff;" class="padding-mobile">
-${ctaButton(block.label, block.url)}
+${ctaButton(block.label, block.url, primary)}
 </td>
 </tr>`;
     case 'divider':
@@ -317,14 +320,20 @@ ${ctaButton(block.label, block.url)}
   }
 }
 
-export function renderBlocksToHTML(blocks: ContentBlock[], siteConfig: { siteName: string }): string {
+export function renderBlocksToHTML(blocks: ContentBlock[], siteConfig: { siteName: string }, brand?: BrandSettings): string {
   const firstHeading = blocks.find(b => b.type === 'heading');
   const preheader = firstHeading?.type === 'heading' ? firstHeading.text : siteConfig.siteName;
 
+  const logoRow = brand?.logoUrl
+    ? `<tr><td style="padding:20px 40px 10px;background-color:#ffffff;border-radius:8px 8px 0 0;text-align:center;" class="padding-mobile">
+        <img src="${brand.logoUrl}" alt="${brand.companyName || siteConfig.siteName}" style="max-height:50px;max-width:200px;display:inline-block;" />
+       </td></tr>`
+    : '';
+
   // Wrap first and last rows with border-radius
   const rows = blocks.map((b, i) => {
-    let row = renderBlockRow(b);
-    if (i === 0) {
+    let row = renderBlockRow(b, brand);
+    if (i === 0 && !logoRow) {
       row = row.replace('background-color:#ffffff;', 'background-color:#ffffff;border-radius:8px 8px 0 0;');
     }
     if (i === blocks.length - 1) {
@@ -336,6 +345,7 @@ export function renderBlocksToHTML(blocks: ContentBlock[], siteConfig: { siteNam
   // Add top padding to first row
   const bodyRows = `<!-- Top spacing -->
 <tr><td style="padding:20px 0 0;"></td></tr>
+${logoRow}
 ${rows}`;
 
   return emailShell(preheader, bodyRows);

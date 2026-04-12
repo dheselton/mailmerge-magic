@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { STARTER_TEMPLATES } from '@/data/email-mock-data';
@@ -16,11 +17,19 @@ const categoryColor: Record<string, string> = {
   Referrals: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
 };
 
+const ALL_CATEGORIES = ['All', 'Sourcing', 'Engagement', 'Scheduling', 'Referrals'] as const;
+
 export function StarterLibraryDialog({ open, onOpenChange, onSelect }: StarterLibraryDialogProps) {
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+
   const handleSelect = (t: StarterTemplate) => {
     onSelect(t.html, t.subject);
     onOpenChange(false);
   };
+
+  const filtered = activeCategory === 'All'
+    ? STARTER_TEMPLATES
+    : STARTER_TEMPLATES.filter(t => t.category === activeCategory);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -29,8 +38,31 @@ export function StarterLibraryDialog({ open, onOpenChange, onSelect }: StarterLi
           <DialogTitle>Starter Library</DialogTitle>
           <p className="text-sm text-muted-foreground">Production-ready, cross-client email templates for recruiting workflows.</p>
         </DialogHeader>
+
+        {/* Category Filter Chips */}
+        <div className="flex flex-wrap gap-2 pb-2">
+          {ALL_CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                activeCategory === cat
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+              }`}
+            >
+              {cat}
+              {cat !== 'All' && (
+                <span className="ml-1 opacity-60">
+                  ({STARTER_TEMPLATES.filter(t => t.category === cat).length})
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {STARTER_TEMPLATES.map(t => (
+          {filtered.map(t => (
             <div
               key={t.id}
               className="group border rounded-lg overflow-hidden cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"

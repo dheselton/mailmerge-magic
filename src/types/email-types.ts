@@ -179,3 +179,31 @@ export const EMAIL_KEY_MERGE_HINTS: Record<EmailKey, string[]> = {
   access_request_owner_notify: ['{{member_name}}', '{{site_name}}'],
   member_password_reset: ['{{member_name}}', '{{site_name}}'],
 };
+
+// Brand settings for email customization
+export interface BrandSettings {
+  primaryColor: string;
+  secondaryColor: string;
+  fontFamily: string;
+  logoUrl: string;
+  companyName: string;
+}
+
+export const DEFAULT_BRAND_SETTINGS: BrandSettings = {
+  primaryColor: '#2563eb',
+  secondaryColor: '#1e40af',
+  fontFamily: 'Arial, Helvetica, sans-serif',
+  logoUrl: '',
+  companyName: 'Your Company',
+};
+
+export const EMAIL_SAFE_FONTS = [
+  'Arial, Helvetica, sans-serif',
+  'Helvetica, Arial, sans-serif',
+  'Georgia, Times, serif',
+  'Verdana, Geneva, sans-serif',
+  'Trebuchet MS, Helvetica, sans-serif',
+  'Tahoma, Geneva, sans-serif',
+  'Lucida Sans, Lucida Grande, sans-serif',
+  'Palatino Linotype, Book Antiqua, serif',
+];
