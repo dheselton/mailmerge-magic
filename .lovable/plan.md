@@ -1,40 +1,55 @@
 
 
-## Enhanced Image Block with Webflow Asset Picker
+## Add Recruiting CRM Starter Templates + Brand Settings Tab (Revised)
 
-### Problem
-The current image block only has a raw URL input — users don't know what sizes work, can't browse existing assets, and can't upload new images. It needs a Webflow-integrated asset picker plus smart size guidance.
+### Key change from previous plan
+Removed "Offer Letter Preview" and "Application Received" templates — those belong to an ATS, not a recruiting CRM. Replaced with CRM-appropriate outreach and engagement templates.
+
+### New Starter Templates (6 additions → 12 total)
+
+| # | Name | Category | Has Images |
+|---|------|----------|------------|
+| 7 | Welcome to Talent Community | Engagement | Hero banner image |
+| 8 | Hiring Manager Introduction | Sourcing | Headshot placeholder |
+| 9 | Culture Spotlight | Engagement | Hero image + team photo |
+| 10 | Diversity & Inclusion Event | Engagement | Hero banner |
+| 11 | Passive Candidate Outreach | Sourcing | Company logo header |
+| 12 | Employee Spotlight / Testimonial | Engagement | Employee photo + quote |
+
+All templates are outbound CRM communications — things a recruiter or talent team would proactively send, not automated ATS status updates.
+
+### Brand Settings
+
+New **Settings** tab in Email module:
+- Primary & secondary color pickers
+- Font family dropdown (email-safe fonts + custom)
+- Company logo URL with preview
+- Company name field
+- Brand settings injected into `renderBlocksToHTML()` and `emailShell()`
 
 ### Plan
 
-**1. Extend Webflow adapter** (`src/adapters/webflow.ts`)
-- Add `uploadAsset(siteId: string, file: File): Promise<WebflowAsset>` to the interface and stub
-- Add `dimensions` field to `WebflowAsset` (`width`, `height`) for size info
-- Add more realistic mock assets with varied dimensions
+**1.** Add `BrandSettings` type to `src/types/email-types.ts`
 
-**2. Create `WebflowAssetPicker` dialog** (`src/components/email/WebflowAssetPicker.tsx`)
-- A `Dialog` component that fetches assets from `webflowAdapter.getAssets()`
-- Grid of asset thumbnails with name, dimensions, and file type badge
-- Search/filter bar to find assets by name
-- Click to select → inserts URL into the image block
-- "Upload New" button at top: opens a file input, calls `webflowAdapter.uploadAsset()`, then selects the newly uploaded asset
-- Shows recommended size guidance: "For best results, use images 600px wide" as a helper note at the top
+**2.** Create `SettingsTab` component (`src/components/email/SettingsTab.tsx`) with color pickers, font selector, logo input, company name
 
-**3. Enhance the image `BlockEditor`** in `EmailComposer.tsx`
-- Add a "Browse Assets" button next to the URL input that opens `WebflowAssetPicker`
-- Add image size guidance text below the URL input: "Recommended: 600px wide, JPG/PNG. Images will be scaled to fit."
-- Add optional width input (number field, default 600) so users can control rendering width
-- Show detected dimensions in the preview thumbnail when an image is loaded
+**3.** Add 6 new template HTML strings to `src/data/email-mock-data.ts` with hero images and inline photos; add `'Onboarding'` category removed — keep existing categories
 
-**4. Update `ImageBlock` type** (`src/types/email-types.ts`)
-- Add optional `webflowAssetId?: string` to track which Webflow asset was used (for future sync)
+**4.** Update `StarterLibraryDialog.tsx` — add category filter chips for browsing 12 templates
+
+**5.** Wire Settings tab into `EmailModule.tsx`, manage `BrandSettings` state
+
+**6.** Update `emailShell()`, `ctaButton()`, `renderBlocksToHTML()` in `src/lib/email-utils.ts` to accept optional `BrandSettings` and inject brand colors/fonts
 
 ### Files Changed
 
 | File | Change |
 |------|--------|
-| `src/adapters/webflow.ts` | Add `uploadAsset`, add `dimensions` to `WebflowAsset`, expand mocks |
-| `src/components/email/WebflowAssetPicker.tsx` | **New** — asset browser dialog with grid, search, upload |
-| `src/components/email/EmailComposer.tsx` | Update image `BlockEditor` with asset picker trigger, size guidance, width control |
-| `src/types/email-types.ts` | Add `webflowAssetId` to `ImageBlock` |
+| `src/types/email-types.ts` | Add `BrandSettings` interface |
+| `src/components/email/SettingsTab.tsx` | **New** — brand config form |
+| `src/data/email-mock-data.ts` | 6 new CRM-focused templates with images |
+| `src/components/email/StarterLibraryDialog.tsx` | Category filter chips |
+| `src/pages/EmailModule.tsx` | Settings tab + BrandSettings state |
+| `src/lib/email-utils.ts` | Brand-aware rendering |
+| `src/components/email/CampaignsTab.tsx` | Pass brand settings to renderer |
 
