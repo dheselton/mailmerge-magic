@@ -7,12 +7,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Sparkles, Upload, Clipboard, BookOpen, Globe, ChevronDown, Monitor, Smartphone, Plus, X, ArrowUp, ArrowDown, Image, Type, Heading, MousePointerClick, Minus } from 'lucide-react';
+import { Sparkles, Upload, Clipboard, BookOpen, Globe, ChevronDown, Monitor, Smartphone, Plus, X, ArrowUp, ArrowDown, Image, Type, Heading, MousePointerClick, Minus, FolderOpen, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AnnouncementForm, ComposeKind, ContentBlock } from '@/types/email-types';
 import { emptyAnnouncementForm, stripEmailScripts, applySampleMerge, renderAnnouncementToHTML, parseHtmlToBlocks, renderBlocksToHTML, genBlockId } from '@/lib/email-utils';
 import { AnnouncementLayoutPreview } from './AnnouncementLayoutPreview';
 import { StarterLibraryDialog } from './StarterLibraryDialog';
+import { WebflowAssetPicker } from './WebflowAssetPicker';
 import { getAIAdapter } from '@/adapters/ai';
 
 interface EmailComposerProps {
@@ -29,7 +30,7 @@ interface EmailComposerProps {
 
 // ========== Block Editor Components ==========
 
-function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: {
+function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast, onOpenAssetPicker }: {
   block: ContentBlock;
   onChange: (b: ContentBlock) => void;
   onDelete: () => void;
@@ -37,6 +38,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst,
   onMoveDown: () => void;
   isFirst: boolean;
   isLast: boolean;
+  onOpenAssetPicker?: () => void;
 }) {
   const controls = (
     <div className="flex items-center gap-0.5 shrink-0">
@@ -81,10 +83,33 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst,
     case 'image':
       return (
         <div className="flex items-start gap-2 p-2 border rounded-md bg-muted/20">
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 space-y-1.5">
             <Label className="text-xs text-muted-foreground">Image</Label>
-            <Input value={block.url} onChange={e => onChange({ ...block, url: e.target.value })} placeholder="Image URL" className="h-8 text-sm" />
-            <Input value={block.alt} onChange={e => onChange({ ...block, alt: e.target.value })} placeholder="Alt text" className="h-8 text-sm" />
+            <div className="flex gap-1.5">
+              <Input value={block.url} onChange={e => onChange({ ...block, url: e.target.value })} placeholder="Image URL" className="h-8 text-sm flex-1" />
+              <Button variant="outline" size="sm" className="h-8 px-2 shrink-0" onClick={onOpenAssetPicker} title="Browse Webflow Assets">
+                <FolderOpen className="h-3.5 w-3.5 mr-1" /> Assets
+              </Button>
+            </div>
+            <div className="flex gap-1.5">
+              <Input value={block.alt} onChange={e => onChange({ ...block, alt: e.target.value })} placeholder="Alt text" className="h-8 text-sm flex-1" />
+              <div className="flex items-center gap-1 shrink-0">
+                <Input
+                  type="number"
+                  value={block.width ?? 600}
+                  onChange={e => onChange({ ...block, width: parseInt(e.target.value) || 600 })}
+                  className="h-8 text-sm w-20"
+                  min={50}
+                  max={600}
+                  title="Display width in pixels"
+                />
+                <span className="text-[10px] text-muted-foreground">px</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-1.5 text-[10px] text-muted-foreground">
+              <Info className="h-3 w-3 mt-0.5 shrink-0" />
+              <span>Recommended: 600px wide, JPG/PNG. Images scale to fit the email.</span>
+            </div>
             {block.url && (
               <div className="mt-1 border rounded overflow-hidden bg-muted/30 max-h-24">
                 <img src={block.url} alt={block.alt} className="max-w-full h-auto max-h-24 object-contain" />
@@ -149,7 +174,8 @@ export function EmailComposer({
   const [starterOpen, setStarterOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+  const [assetPickerBlockId, setAssetPickerBlockId] = useState<string | null>(null);
   // Parse HTML into blocks and switch to visual mode
   const applyHtmlWithParsing = (html: string) => {
     const clean = stripEmailScripts(html);
@@ -329,6 +355,10 @@ export function EmailComposer({
                     onMoveDown={() => moveBlock(block.id, 1)}
                     isFirst={idx === 0}
                     isLast={idx === formPayload.blocks.length - 1}
+                    onOpenAssetPicker={() => {
+                      setAssetPickerBlockId(block.id);
+                      setAssetPickerOpen(true);
+                    }}
                   />
                 ))}
               </div>
@@ -422,6 +452,25 @@ export function EmailComposer({
       </Collapsible>
 
       <StarterLibraryDialog open={starterOpen} onOpenChange={setStarterOpen} onSelect={handleStarterSelect} />
+      <WebflowAssetPicker
+        open={assetPickerOpen}
+        onOpenChange={setAssetPickerOpen}
+        onSelect={(asset) => {
+          if (assetPickerBlockId) {
+            const block = formPayload.blocks.find(b => b.id === assetPickerBlockId);
+            if (block && block.type === 'image') {
+              updateBlock(assetPickerBlockId, {
+                ...block,
+                url: asset.url,
+                alt: asset.name,
+                width: asset.dimensions ? Math.min(asset.dimensions.width, 600) : 600,
+                webflowAssetId: asset.id,
+              });
+            }
+          }
+          setAssetPickerBlockId(null);
+        }}
+      />
     </div>
   );
 }
