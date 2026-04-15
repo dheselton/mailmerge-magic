@@ -13,6 +13,7 @@ import type { AnnouncementForm, ComposeKind, ContentBlock } from '@/types/email-
 import { emptyAnnouncementForm, stripEmailScripts, applySampleMerge, renderAnnouncementToHTML, parseHtmlToBlocks, renderBlocksToHTML, genBlockId } from '@/lib/email-utils';
 import { AnnouncementLayoutPreview } from './AnnouncementLayoutPreview';
 import { StarterLibraryDialog } from './StarterLibraryDialog';
+import type { StarterTemplate } from '@/data/email-mock-data';
 import { WebflowAssetPicker } from './WebflowAssetPicker';
 import { getAIAdapter } from '@/adapters/ai';
 
@@ -216,8 +217,8 @@ export function EmailComposer({
     setPasteOpen(false);
   };
 
-  const handleStarterSelect = (html: string) => {
-    applyHtmlWithParsing(html);
+  const handleStarterSelect = (template: StarterTemplate) => {
+    applyHtmlWithParsing(template.html);
     setStarterOpen(false);
   };
 

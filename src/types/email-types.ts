@@ -67,9 +67,19 @@ export interface SpacerBlock {
 export type ContentBlock = HeadingBlock | TextBlock | ImageBlock | ButtonBlock | DividerBlock | SpacerBlock;
 
 export interface AnnouncementForm {
+  /** Small label / kicker above headline in designed templates */
+  eyebrow: string;
   headline: string;
   subhead: string;
   message: string;
+  /**
+   * Sanitized inner HTML snapshot of `[data-region="body"]` from import (lists, basic inline).
+   * When `useMessageRichHtml` is true and this is non-empty, preview prefers this over plain `message`.
+   */
+  messageRichHtml: string | null;
+  useMessageRichHtml: boolean;
+  /** Inbox preview line (preheader) */
+  previewText: string;
   buttonLabel: string;
   buttonUrl: string;
   signOff: string;
@@ -90,6 +100,10 @@ export interface EmailCampaign {
   sent_at: string | null;
   created_by: string;
   created_at: string;
+  /** 0–100 for sent campaigns (UI / mock) */
+  open_rate?: number;
+  /** Resolved pool / source label for tables */
+  pool_label?: string;
 }
 
 export interface EmailTemplate {
@@ -182,6 +196,8 @@ export const EMAIL_KEY_MERGE_HINTS: Record<EmailKey, string[]> = {
 
 // Brand settings for email customization
 export interface BrandSettings {
+  /** When false, previews use default blue / neutrals */
+  useBrandColors: boolean;
   primaryColor: string;
   secondaryColor: string;
   fontFamily: string;
@@ -190,12 +206,21 @@ export interface BrandSettings {
 }
 
 export const DEFAULT_BRAND_SETTINGS: BrandSettings = {
+  useBrandColors: false,
   primaryColor: '#2563eb',
   secondaryColor: '#1e40af',
   fontFamily: 'Arial, Helvetica, sans-serif',
   logoUrl: '',
   companyName: 'Your Company',
 };
+
+/** Web-safe fonts shown in Settings (email-safe) */
+export const SETTINGS_EMAIL_FONTS = [
+  'Arial, Helvetica, sans-serif',
+  'Georgia, Times, serif',
+  'Verdana, Geneva, sans-serif',
+  'Trebuchet MS, Helvetica, sans-serif',
+] as const;
 
 export const EMAIL_SAFE_FONTS = [
   'Arial, Helvetica, sans-serif',

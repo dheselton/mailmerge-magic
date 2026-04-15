@@ -2,11 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import type { BrandSettings } from '@/types/email-types';
-import { EMAIL_SAFE_FONTS } from '@/types/email-types';
+import { SETTINGS_EMAIL_FONTS } from '@/types/email-types';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ctaButton } from '@/lib/email-utils';
 import { Palette, Type, Image, Building2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SettingsTabProps {
   brand: BrandSettings;
@@ -15,8 +16,10 @@ interface SettingsTabProps {
 
 export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
   const update = (patch: Partial<BrandSettings>) => onBrandChange({ ...brand, ...patch });
-
-  const isCustomFont = !EMAIL_SAFE_FONTS.includes(brand.fontFamily);
+  const useBrand = brand.useBrandColors === true;
+  const fontValue = SETTINGS_EMAIL_FONTS.includes(brand.fontFamily as (typeof SETTINGS_EMAIL_FONTS)[number])
+    ? brand.fontFamily
+    : SETTINGS_EMAIL_FONTS[0];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -29,7 +32,17 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="use-brand-colors"
+                checked={useBrand}
+                onCheckedChange={c => update({ useBrandColors: c === true })}
+              />
+              <Label htmlFor="use-brand-colors" className="text-sm font-normal cursor-pointer">
+                Brand colors
+              </Label>
+            </div>
+            <div className={cn('space-y-2', !useBrand && 'opacity-70')}>
               <Label>Primary Color</Label>
               <div className="flex gap-2">
                 <input
@@ -47,7 +60,7 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
               </div>
               <p className="text-xs text-muted-foreground">Used for CTA buttons, headers, and accents.</p>
             </div>
-            <div className="space-y-2">
+            <div className={cn('space-y-2', !useBrand && 'opacity-70')}>
               <Label>Secondary Color</Label>
               <div className="flex gap-2">
                 <input
@@ -65,6 +78,9 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
               </div>
               <p className="text-xs text-muted-foreground">Used for borders, hover states, and secondary elements.</p>
             </div>
+            {!useBrand && (
+              <p className="text-xs text-muted-foreground">Preview uses default blue until brand colors are enabled.</p>
+            )}
           </CardContent>
         </Card>
 
@@ -77,32 +93,19 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Font Family</Label>
-              <Select
-                value={isCustomFont ? '__custom__' : brand.fontFamily}
-                onValueChange={v => {
-                  if (v !== '__custom__') update({ fontFamily: v });
-                }}
-              >
+              <Select value={fontValue} onValueChange={v => update({ fontFamily: v })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {EMAIL_SAFE_FONTS.map(f => (
+                  {SETTINGS_EMAIL_FONTS.map(f => (
                     <SelectItem key={f} value={f}>
                       <span style={{ fontFamily: f }}>{f.split(',')[0]}</span>
                     </SelectItem>
                   ))}
-                  <SelectItem value="__custom__">Custom…</SelectItem>
                 </SelectContent>
               </Select>
-              {isCustomFont && (
-                <Input
-                  value={brand.fontFamily}
-                  onChange={e => update({ fontFamily: e.target.value })}
-                  placeholder="'Custom Font', Arial, sans-serif"
-                />
-              )}
-              <p className="text-xs text-muted-foreground">Email clients support limited fonts. Web-safe fonts recommended.</p>
+              <p className="text-xs text-muted-foreground">Web-safe fonts only (best support in email clients).</p>
             </div>
           </CardContent>
         </Card>
@@ -121,7 +124,7 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
                 onChange={e => update({ logoUrl: e.target.value })}
                 placeholder="https://yourcompany.com/logo.png"
               />
-              <p className="text-xs text-muted-foreground">Recommended: 200×50px or similar horizontal logo. PNG or JPG.</p>
+              <p className="text-xs text-muted-foreground">Recommended: 300×50px. PNG or JPG.</p>
             </div>
             {brand.logoUrl && (
               <div className="border rounded-md p-4 bg-muted/30 flex items-center justify-center">
@@ -174,7 +177,8 @@ export function SettingsTab({ brand, onBrandChange }: SettingsTabProps) {
 }
 
 function generatePreviewHtml(brand: BrandSettings): string {
-  const { primaryColor, fontFamily, logoUrl, companyName } = brand;
+  const { fontFamily, logoUrl, companyName } = brand;
+  const primaryColor = brand.useBrandColors ? brand.primaryColor : '#2563eb';
   const logoRow = logoUrl
     ? `<tr><td style="padding:20px 40px 10px;background-color:#ffffff;border-radius:8px 8px 0 0;text-align:center;">
         <img src="${logoUrl}" alt="${companyName}" style="max-height:50px;max-width:200px;display:inline-block;" />

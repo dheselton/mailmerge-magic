@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,10 +11,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Plus, MoreVertical, Copy, Trash2, Pencil, Sparkles, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import type { EmailTemplate, ComposeKind, AnnouncementForm } from '@/types/email-types';
-import { MOCK_TEMPLATES } from '@/data/email-mock-data';
+import { STARTER_TEMPLATES, type StarterTemplate } from '@/data/email-mock-data';
 import { emptyAnnouncementForm, payloadToAnnouncementForm, stripEmailScripts, applySampleMerge, parseHtmlToBlocks } from '@/lib/email-utils';
 import { getAIAdapter } from '@/adapters/ai';
 import { StarterLibraryDialog } from './StarterLibraryDialog';
+import { EmailImagesPanel } from '@/components/email/EmailImagesPanel';
 
 interface TemplatesTabProps {
   templates: EmailTemplate[];
@@ -100,6 +101,51 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
     toast.success('Template deleted');
   };
 
+  const builtInTemplates = useMemo((): EmailTemplate[] => {
+    const now = new Date().toISOString();
+    return STARTER_TEMPLATES.map((s: StarterTemplate) => {
+      const clean = stripEmailScripts(s.html);
+      const blocks = parseHtmlToBlocks(clean);
+      const kind: ComposeKind = blocks.length > 0 ? 'announcement_form' : 'raw_html';
+      return {
+        id: s.id,
+        site_id: 'site-1',
+        name: s.name,
+        subject: s.subject || '',
+        html_body: clean,
+        kind,
+        form_payload: null,
+        source: 'manual',
+        webflow_asset_refs: [],
+        created_by: 'builtin',
+        created_at: now,
+        updated_at: now,
+      };
+    });
+  }, []);
+
+  const handleCopyBuiltin = (t: EmailTemplate) => {
+    const now = new Date().toISOString();
+    const blocks = parseHtmlToBlocks(t.html_body);
+    const kind: ComposeKind = blocks.length > 0 ? 'announcement_form' : 'raw_html';
+    const newTemplate: EmailTemplate = {
+      id: `tpl-${Date.now()}`,
+      site_id: 'site-1',
+      name: `${t.name} (Copy)`,
+      subject: t.subject,
+      html_body: t.html_body,
+      kind,
+      form_payload: null,
+      source: 'manual',
+      webflow_asset_refs: [],
+      created_by: 'user-1',
+      created_at: now,
+      updated_at: now,
+    };
+    onTemplatesChange([newTemplate, ...templates]);
+    toast.success('Copied to My Templates');
+  };
+
   const handleAIGenerate = async () => {
     if (!aiPrompt.trim()) return;
     setAiLoading(true);
@@ -125,11 +171,12 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
     }
   };
 
-  const handleStarterSelect = (html: string, subject?: string) => {
+  const handleStarterSelect = (template: StarterTemplate) => {
+    const html = template.html;
     const blocks = parseHtmlToBlocks(html);
     setEditTemplate(null);
     setEditName('');
-    setEditSubject(subject || '');
+    setEditSubject(template.subject || '');
     setEditHtml(html);
     if (blocks.length > 0) {
       setEditForm({ ...emptyAnnouncementForm(), blocks, useBlocks: true });
@@ -158,39 +205,98 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
         </DropdownMenu>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {templates.map(t => (
-          <Card key={t.id}>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">{t.name}</CardTitle>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="h-3 w-3" /></Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => onUseTemplate(t)}>Use Template</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openEditor(t)}><Pencil className="h-3 w-3 mr-1" /> Edit</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicate(t)}><Copy className="h-3 w-3 mr-1" /> Duplicate</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-destructive"><Trash2 className="h-3 w-3 mr-1" /> Delete</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="flex gap-1">
-                <Badge variant="outline" className="text-xs">{t.kind === 'announcement_form' ? 'Visual' : 'HTML'}</Badge>
-                {t.source === 'ai_generated' && <Badge variant="secondary" className="text-xs"><Sparkles className="h-3 w-3 mr-0.5" />AI</Badge>}
-              </div>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <div className="border rounded overflow-hidden h-32">
-                <iframe srcDoc={applySampleMerge(t.html_body, {})} className="w-full h-full border-0 pointer-events-none" title={t.name} sandbox="" style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '200%', height: '200%' }} />
-              </div>
-            </CardContent>
-            <CardFooter className="text-xs text-muted-foreground">
-              {t.subject}
-            </CardFooter>
-          </Card>
-        ))}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-muted-foreground tracking-wide">BUILT-IN TEMPLATES</p>
+          <p className="text-xs text-muted-foreground">{builtInTemplates.length} templates</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {builtInTemplates.map(t => (
+            <Card key={t.id}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm">{t.name}</CardTitle>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <MoreVertical className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => onUseTemplate(t)}>Use Template</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleCopyBuiltin(t)}>
+                        <Copy className="h-3 w-3 mr-1" /> Copy to My Templates
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex gap-1">
+                  <Badge variant="outline" className="text-xs">{t.kind === 'announcement_form' ? 'Visual' : 'HTML'}</Badge>
+                  <Badge variant="secondary" className="text-xs">Built-in</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="border rounded overflow-hidden h-32">
+                  <iframe
+                    srcDoc={applySampleMerge(t.html_body, {})}
+                    className="w-full h-full border-0 pointer-events-none"
+                    title={t.name}
+                    sandbox=""
+                    style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '200%', height: '200%' }}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="text-xs text-muted-foreground">
+                {t.subject}
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-muted-foreground tracking-wide">MY TEMPLATES</p>
+          <p className="text-xs text-muted-foreground">{templates.length} templates</p>
+        </div>
+        {templates.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No saved templates yet. Click Create → Blank Template or Copy a built-in.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {templates.map(t => (
+              <Card key={t.id}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">{t.name}</CardTitle>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="h-3 w-3" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => onUseTemplate(t)}>Use Template</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openEditor(t)}><Pencil className="h-3 w-3 mr-1" /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDuplicate(t)}><Copy className="h-3 w-3 mr-1" /> Duplicate</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-destructive"><Trash2 className="h-3 w-3 mr-1" /> Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="flex gap-1">
+                    <Badge variant="outline" className="text-xs">{t.kind === 'announcement_form' ? 'Visual' : 'HTML'}</Badge>
+                    {t.source === 'ai_generated' && <Badge variant="secondary" className="text-xs"><Sparkles className="h-3 w-3 mr-0.5" />AI</Badge>}
+                  </div>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="border rounded overflow-hidden h-32">
+                    <iframe srcDoc={applySampleMerge(t.html_body, {})} className="w-full h-full border-0 pointer-events-none" title={t.name} sandbox="" style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '200%', height: '200%' }} />
+                  </div>
+                </CardContent>
+                <CardFooter className="text-xs text-muted-foreground">
+                  {t.subject}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Editor Dialog */}
@@ -234,6 +340,7 @@ export function TemplatesTab({ templates, onTemplatesChange, onUseTemplate }: Te
                 <Textarea value={editHtml} onChange={e => setEditHtml(e.target.value)} rows={12} className="font-mono text-sm" placeholder="<html>...</html>" />
               </TabsContent>
             </Tabs>
+            <EmailImagesPanel htmlBody={editHtml} onHtmlBodyChange={setEditHtml} />
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setEditOpen(false)}>Cancel</Button>

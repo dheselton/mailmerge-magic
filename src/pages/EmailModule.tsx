@@ -1,31 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { CampaignsTab } from '@/components/email/CampaignsTab';
+import { Button } from '@/components/ui/button';
+import { CampaignsTab, type InjectedCampaignDraft } from '@/components/email/CampaignsTab';
 import { TemplatesTab } from '@/components/email/TemplatesTab';
 import { AutomationsTab } from '@/components/email/AutomationsTab';
 import { SettingsTab } from '@/components/email/SettingsTab';
 import type { EmailTemplate, ComposeKind, AnnouncementForm, BrandSettings } from '@/types/email-types';
 import { DEFAULT_BRAND_SETTINGS } from '@/types/email-types';
-import { MOCK_TEMPLATES } from '@/data/email-mock-data';
-import { emptyAnnouncementForm, payloadToAnnouncementForm } from '@/lib/email-utils';
+import { payloadToAnnouncementForm } from '@/lib/email-utils';
 import { Mail } from 'lucide-react';
 
-const EmailModule = () => {
-  const [activeTab, setActiveTab] = useState('campaigns');
-  const [templates, setTemplates] = useState<EmailTemplate[]>(MOCK_TEMPLATES);
-  const [brandSettings, setBrandSettings] = useState<BrandSettings>(DEFAULT_BRAND_SETTINGS);
+const STORAGE_KEY_TEMPLATES = 'email-module-templates-v1';
 
-  // When "Use Template" is clicked in Templates tab, switch to Campaigns and load it
-  const [loadedSubject, setLoadedSubject] = useState('');
-  const [loadedHtml, setLoadedHtml] = useState('');
-  const [loadedKind, setLoadedKind] = useState<ComposeKind>('raw_html');
-  const [loadedForm, setLoadedForm] = useState<AnnouncementForm>(emptyAnnouncementForm());
+function loadTemplatesFromStorage(): EmailTemplate[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY_TEMPLATES);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed as EmailTemplate[];
+  } catch {
+    return [];
+  }
+}
+
+const EmailModule = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('campaigns');
+  const [templates, setTemplates] = useState<EmailTemplate[]>(() => loadTemplatesFromStorage());
+  const [brandSettings, setBrandSettings] = useState<BrandSettings>(DEFAULT_BRAND_SETTINGS);
+  const [injectedDraft, setInjectedDraft] = useState<InjectedCampaignDraft | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY_TEMPLATES, JSON.stringify(templates));
+    } catch {
+      // ignore storage failures (quota/private mode)
+    }
+  }, [templates]);
 
   const handleUseTemplate = (t: EmailTemplate) => {
-    setLoadedSubject(t.subject);
-    setLoadedHtml(t.html_body);
-    setLoadedKind(t.kind);
-    setLoadedForm(t.form_payload ? payloadToAnnouncementForm(t.form_payload) : emptyAnnouncementForm());
+    setInjectedDraft({
+      nonce: Date.now(),
+      subject: t.subject,
+      html_body: t.html_body,
+      compose_kind: t.kind,
+      form_payload: t.form_payload ? payloadToAnnouncementForm(t.form_payload) : null,
+    });
     setActiveTab('campaigns');
   };
 
@@ -56,23 +79,37 @@ const EmailModule = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="automations">Automations</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
+          <TabsList>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="automations">Automations</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+          {activeTab === 'campaigns' && (
+            <Button
+              className="sm:shrink-0"
+              onClick={() => {
+                setActiveTab('campaigns');
+                navigate('/email/campaign/new', { state: { brandSettings } });
+              }}
+            >
+              + New Campaign
+            </Button>
+          )}
+        </div>
 
         <TabsContent value="campaigns" className="mt-4">
-          <CampaignsTab onSaveAsTemplate={handleSaveAsTemplate} brandSettings={brandSettings} />
+          <CampaignsTab
+            onSaveAsTemplate={handleSaveAsTemplate}
+            brandSettings={brandSettings}
+            injectedDraft={injectedDraft}
+            onInjectedDraftConsumed={() => setInjectedDraft(null)}
+          />
         </TabsContent>
 
         <TabsContent value="templates" className="mt-4">
-          <TemplatesTab
-            templates={templates}
-            onTemplatesChange={setTemplates}
-            onUseTemplate={handleUseTemplate}
-          />
+          <TemplatesTab templates={templates} onTemplatesChange={setTemplates} onUseTemplate={handleUseTemplate} />
         </TabsContent>
 
         <TabsContent value="automations" className="mt-4">

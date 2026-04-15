@@ -66,3 +66,117 @@ export function getAIAdapter(provider?: string): AIAdapter {
     default: return openaiAdapter;
   }
 }
+
+export type AICampaignTone = 'Professional' | 'Friendly' | 'Casual' | 'Urgent';
+export type AICampaignLength = 'Short' | 'Medium' | 'Detailed';
+
+export interface AICampaignFormFields {
+  subject: string;
+  previewText: string;
+  headline: string;
+  subhead: string;
+  message: string;
+  buttonLabel: string;
+  buttonUrl: string;
+  signOff: string;
+}
+
+/** Deterministic stub: fills plain-text form fields only (no raw HTML). */
+export async function generateCampaignFormFields(params: {
+  goal: string;
+  jobTitle: string;
+  tone: AICampaignTone;
+  length: AICampaignLength;
+  companyName: string;
+}): Promise<AICampaignFormFields> {
+  await new Promise(r => setTimeout(r, 500));
+  const jt = params.jobTitle.trim() || '{{job_title}}';
+  const co = params.companyName.trim() || 'Our team';
+  const tone = params.tone;
+  const len = params.length;
+  const open =
+    tone === 'Casual'
+      ? `Hey there — quick note about a ${jt} opportunity at ${co}.`
+      : tone === 'Urgent'
+        ? `Time-sensitive: we're actively hiring for ${jt} at ${co}.`
+        : tone === 'Friendly'
+          ? `We wanted to reach out about an exciting ${jt} role at ${co}.`
+          : `We're reaching out regarding the ${jt} position at ${co}.`;
+  const mid =
+    len === 'Detailed'
+      ? `${open}\n\nWe think your background could be a strong match. We'd love to share more about the team, scope, and what success looks like in the first 90 days.\n\nIf you're open to it, the next step is simple: review the role and apply when you're ready.`
+      : len === 'Medium'
+        ? `${open}\n\nWe'd love to tell you more about the role and team — take a look and let us know if you'd like to connect.`
+        : `${open} Take a look and apply if it feels like a fit.`;
+  const subj =
+    params.goal.includes('interview')
+      ? `Interview details — ${jt}`
+      : params.goal.includes('event')
+        ? `You're invited — ${co}`
+        : params.goal.includes('Referral')
+          ? `${co} is hiring — know someone great?`
+          : `New opportunity: ${jt} at ${co}`;
+  return {
+    subject: subj.slice(0, 60),
+    previewText: len === 'Short' ? `${jt} at ${co}` : `${jt} · ${co} · ${params.goal.slice(0, 40)}`,
+    headline: jt,
+    subhead: `${co} · Talent`,
+    message: mid,
+    buttonLabel: params.goal.includes('event') ? 'RSVP' : 'View Role & Apply',
+    buttonUrl: '{{apply_url}}',
+    signOff: `Best,\n${co} Recruiting`,
+  };
+}
+
+/** Chat → plain form fields only (no HTML). Stub uses last user message heuristics + generateCampaignFormFields. */
+export async function generateFromConversation(params: {
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  companyName: string;
+}): Promise<AICampaignFormFields> {
+  await new Promise(r => setTimeout(r, 650));
+  const lastUser = [...params.messages].reverse().find(m => m.role === 'user')?.content?.trim() ?? '';
+  const lower = lastUser.toLowerCase();
+  let goal = 'Source passive candidates';
+  if (lower.includes('interview') || lower.includes('confirm')) goal = 'Confirm interview';
+  else if (lower.includes('event') || lower.includes('invite')) goal = 'Invite to event';
+  else if (lower.includes('refer')) goal = 'Referral ask';
+  else if (lower.includes('re-engage') || lower.includes('reconnect')) goal = 'Re-engage past applicants';
+
+  let tone: AICampaignTone = 'Friendly';
+  if (lower.includes('professional') || lower.includes('formal')) tone = 'Professional';
+  if (lower.includes('casual')) tone = 'Casual';
+  if (lower.includes('urgent') || lower.includes('asap')) tone = 'Urgent';
+
+  let length: AICampaignLength = 'Short';
+  if (lower.includes('detailed') || lower.includes('longer')) length = 'Detailed';
+  else if (lower.includes('medium')) length = 'Medium';
+
+  const jobGuess =
+    lastUser.match(/\b(?:for|role|title)\s*[:\s]+\s*([^.,\n]{2,80})/i)?.[1]?.trim() ||
+    lastUser.match(/\b(?:engineer|manager|designer|nurse|developer)\b[^.,\n]*/i)?.[0]?.trim() ||
+    '';
+
+  return generateCampaignFormFields({
+    goal,
+    jobTitle: jobGuess,
+    tone,
+    length,
+    companyName: params.companyName,
+  });
+}
+
+export function quickEditMessageBody(
+  message: string,
+  mode: 'shorter' | 'personal' | 'urgency'
+): string {
+  const t = message.trim();
+  if (!t) return message;
+  if (mode === 'shorter') {
+    const first = t.split(/\n\n/)[0] || t;
+    return first.length > 120 ? `${first.slice(0, 117)}…` : first;
+  }
+  if (mode === 'personal') {
+    return `Hi {{member_name}},\n\n${t}`;
+  }
+  return `Quick note — we'd love a response this week if you're interested.\n\n${t}`;
+}
